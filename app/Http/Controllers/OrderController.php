@@ -7,6 +7,8 @@ use Response;
 use Validator;
 use Illuminate\Support\Str;
 use App\Modals\Order;
+use App\User;
+use App\Modals\Task;
 
 class OrderController extends Controller
 {
@@ -30,11 +32,31 @@ class OrderController extends Controller
         $data = $this->uploadData($request);
         $orders = Order::orderBy('id', 'desc')->take(count($data))->get();
         return response()->json(['msg' => 'Order Added Successfully','detail' => $orders], 200);
+    }
 
-    }
     function orderView(){
-        return View('includes.upload');
+        $users = User::presale()->get();
+        // echo "<pre>";print_r($users);exit;
+        return View('includes.upload',compact('users'));
     }
+
+    function publishOrder(Request $request){
+        $rules = [
+            'order_id'         => 'required|array',
+            'assigned_by'          => 'required|exists:users,id',
+            'assigned_to'          => 'required|exists:users,id',
+            'status'         => 'sometimes'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails() ) {
+            return response()->json(['msg' => $validator->errors()->first()], 400);
+        }
+        $data = $request->validate($rules);
+        $task = Task::create($data);
+    }
+
     public function uploadData($request){
         $folder = public_path('uploads');
         $file = $request->file('csvFile');

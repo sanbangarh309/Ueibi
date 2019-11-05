@@ -2,7 +2,8 @@
 @extends('app')
 @section('css')
 <link rel="stylesheet" href="/css/card.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css">
+{{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css"> --}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css" />
 <style>
 /* .datepicker {
       z-index: 1600 !important; /* has to be larger than 1050 */
@@ -23,6 +24,7 @@
     <table class="table table-hover">
     <thead>
       <tr>
+        <th><input type="checkbox" id="check_all" value="all"></th>
         <th>Order#</th>
         <th>Company Name</th>
         <th>Area</th>
@@ -44,48 +46,51 @@
     </div>
     </div>
     </div>
+    <div class="col-lg-12 col-12 mb-4 mt-4" style="margin-top: 30px;">
+      <div class="card">
+        <div class="card-body text-center">
+          <div class="row">
+              <div class="col-lg-6">
+                  <div class="form-group">
+                      <select class="form-control selectpicker" id="sel1">
+                        <option>Select Pre Sale Manager</option>
+                        @foreach($users as $user)
+                          <option value="{{$user->id}}">{{$user->name}}</option>
+                        @endforeach
+                      </select>
+                    </div> 
+              </div>
+              <div class="col-lg-6">
+                  <div class="form-group">
+                      <button type="button" class="btn btn-success">Publish</button>
+                   </div> 
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
     </div>
 @stop
 
 @section('javascript')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.min.js"></script>
 <script>
+  $(".selectpicker").select2({
+  tags: true
+});
 getOrders();
 // let allCalls = San_Helpers.getCalls("{{route('calls.index')}}");
 function getOrders(){
   axios.get("{{route('orders.index')}}").then((res) => {
-    console.log(res.data);
     let orders = res.data.detail;
     let minifyHtml = '';
     $.each(orders, function( index, call ) {
-      minifyHtml = '<tr><td>'+call.orderno+'</td><td>'+call.area+'</td><td>'+call.city+'</td><td>'+call.company+'</td><td>'+call.address+'</td><td>'+call.contact+'</td><td>'+call.email+'</td><td>'+call.industry+'</td><td>'+call.assigned_date+'</td><td><button><i class="fa fa-pencil" aria-hidden="true"></i></button></td></tr>';
+      minifyHtml = '<tr><td><input type="checkbox" name="check_order" class="check_all_boxes" id="'+call.id+'" id="select_all"></td><td>'+call.orderno+'</td><td>'+call.area+'</td><td>'+call.city+'</td><td>'+call.company+'</td><td>'+call.address+'</td><td>'+call.contact+'</td><td>'+call.email+'</td><td>'+call.industry+'</td><td>'+call.assigned_date+'</td><td><button><i class="fa fa-pencil" aria-hidden="true"></i></button></td></tr>';
       $('#order_body').append(minifyHtml);
     });
     // $('#support_body').html(minifyHtml);
   });
 }
-// console.log('toater', toastr);
-// toastr.success('done');
-let userType;
-// function showaddCallModal(type) {
-  // userType = type;
-  // $('#addCall input[name="type"]').val(type);
-  // $('#addCall').modal('show');
-// }
-$('#call_form').on('submit',function(e){
-  let data = new FormData(this);
-  axios.post("{{route('orders.store')}}",data).then((response) => {
-    console.log(response.data.detail);
-    let call = response.data.detail;
-    let minifyHtml = '<tr><td>'+call.id+'</td><td>'+call.phone+'</td><td>'+call.person_name+'</td><td>'+call.company+'</td><td>'+call.city+'</td><td>'+call.website+'</td><td>'+call.status+'</td><td>'+call.date_time+'</td><td>'+call.no_of_calls+'</td><td>'+call.remarks+'</td><td><button><i class="fa fa-pencil" aria-hidden="true"></i></button></td></tr>';
-    $('#order_body').append(minifyHtml);
-    $('#addCall').modal('hide');
-    toastr.success(response.data.msg);
-  }).catch((error) => {
-    toastr.error("toastr alert-type " + error.response.data.msg + " is unknown");
-    console.log(error);
-  });
-  return false;
-});
 $('#csv_data_upload').on('change',function(e){
   var file = e.target.files[0];
   let formData = new FormData();
@@ -94,12 +99,56 @@ $('#csv_data_upload').on('change',function(e){
     let orders = response.data.detail;
     let minifyHtml = '';
     $.each(orders, function( index, order ) {
-      minifyHtml = '<tr><td>'+order.orderno+'</td><td>'+order.area+'</td><td>'+order.city+'</td><td>'+order.company+'</td><td>'+order.address+'</td><td>'+order.contact+'</td><td>'+order.email+'</td><td>'+order.industry+'</td><td>'+order.assigned_date+'</td><td><button><i class="fa fa-pencil" aria-hidden="true"></i></button></td></tr>';
+      minifyHtml = '<tr><td><input type="checkbox" name="check_order" class="check_all_boxes" id="'+order.id+'" id="select_all"></td><td>'+order.orderno+'</td><td>'+order.area+'</td><td>'+order.city+'</td><td>'+order.company+'</td><td>'+order.address+'</td><td>'+order.contact+'</td><td>'+order.email+'</td><td>'+order.industry+'</td><td>'+order.assigned_date+'</td><td><button><i class="fa fa-pencil" aria-hidden="true"></i></button></td></tr>';
       $('#order_body').append(minifyHtml);
     });
     console.log(response);
   });
   console.log(file);
+});
+
+let checkedIds = [];
+var CustomerIDArray=[];
+$(document).on('click','.check_all_boxes',function(e){
+    var arr=CustomerIDArray;
+		var checkedId=$(this).attr('id');
+		if($(this).prop('checked')){
+			CustomerIDArray.push(checkedId);
+			arr=CustomerIDArray;
+		}
+		else
+		{
+			jQuery.each(CustomerIDArray,function(i,item){
+				if(arr[i] == checkedId) {
+					arr.splice(i, 1);
+				}
+			});
+			CustomerIDArray =arr;
+		}
+		var ids="";
+			jQuery.each(CustomerIDArray,function(i,item){
+				if(ids=="")
+				{
+					ids= CustomerIDArray[i];
+				}
+				else
+				{
+					ids= ids+ ","+   CustomerIDArray[i];
+				}
+			});
+  console.log(CustomerIDArray);
+});
+$('#check_all').on('click',function(){
+  CustomerIDArray = [];
+  if ($(this).is(":checked")) {
+    $( ".check_all_boxes" ).not(this).each(function( index ) {
+      CustomerIDArray.push($( this ).attr('id'));
+    });
+    $('.check_all_boxes').not(this).prop('checked', true);
+  } else {
+    $('.check_all_boxes').not(this).prop('checked', false);
+  }
+  console.log(CustomerIDArray);
 });
 // $('#date_time_picker').datetimepicker();
 </script>
