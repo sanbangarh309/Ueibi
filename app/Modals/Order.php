@@ -29,6 +29,18 @@ class Order extends Model
         $this->attributes['orderno'] = Str::random(5);
     }
 
+    public function ScopeNew($query)
+    {
+        return $query->whereAssigned(0);
+    }
+
+    public function ScopePublished($query)
+    {
+        return $query->whereAssigned(1);
+    }
+
+    
+
     public function save(array $options = array())
     {
         if(empty($this->orderno) || is_null($this->orderno)) {

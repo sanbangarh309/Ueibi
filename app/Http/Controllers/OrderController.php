@@ -19,7 +19,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::all();
+        $orders = Order::new()->get();
         return response()->json(['msg' => 'Orders Listing','detail' => $orders], 200);
     }
     /*
@@ -36,15 +36,16 @@ class OrderController extends Controller
 
     function orderView(){
         $users = User::presale()->get();
-        // echo "<pre>";print_r($users);exit;
-        return View('includes.upload',compact('users'));
+        $user = auth()->user();
+        // echo "<pre>";print_r(auth()->user()->id);exit;
+        return View('includes.upload',compact('users','user'));
     }
 
     function publishOrder(Request $request){
         $rules = [
-            'order_id'         => 'required|array',
-            'assigned_by'          => 'required|exists:users,id',
-            'assigned_to'          => 'required|exists:users,id',
+            'order_ids'         => 'required|array',
+            'assigned_by'       => 'required|exists:users,id',
+            'assigned_to'       => 'required|exists:users,id',
             'status'         => 'sometimes'
         ];
 
@@ -54,7 +55,30 @@ class OrderController extends Controller
             return response()->json(['msg' => $validator->errors()->first()], 400);
         }
         $data = $request->validate($rules);
-        $task = Task::create($data);
+        foreach($request->order_ids as $orderid){
+            $insertData[] = [
+                'order_id' => $orderid,
+                'assigned_by' => $request->assigned_by,
+                'assigned_to' => $request->assigned_to,
+                'status' => $request->status ? $request->status : 'received'
+            ];
+            $order = Order::find($orderid);
+            $order->assigned = 1;
+            $order->save();
+        }
+        Task::insert($insertData);
+        return response()->json(['msg' => 'Orders Published Successfully','detail' => $insertData], 200);
+    }
+
+    public function uploadHistory(Request $request){
+        $user = auth()->user();
+        return View('includes.history',compact('user'));
+    }
+
+    public function publishedOrders()
+    {
+        $orders = Order::published()->get();
+        return response()->json(['msg' => 'Orders Listing','detail' => $orders], 200);
     }
 
     public function uploadData($request){
