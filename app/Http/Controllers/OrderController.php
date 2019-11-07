@@ -38,7 +38,7 @@ class OrderController extends Controller
         $users = User::presale()->get();
         $user = auth()->user();
         // echo "<pre>";print_r(auth()->user()->id);exit;
-        return View('includes.upload',compact('users','user'));
+        return View('support.upload',compact('users','user'));
     }
 
     function publishOrder(Request $request){
@@ -72,7 +72,7 @@ class OrderController extends Controller
 
     public function uploadHistory(Request $request){
         $user = auth()->user();
-        return View('includes.history',compact('user'));
+        return View('support.history',compact('user'));
     }
 
     public function publishedOrders()
