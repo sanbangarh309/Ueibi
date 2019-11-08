@@ -27,5 +27,9 @@ Route::group(['prefix' => 'admin'], function () {
         'orders' => 'OrderController',
     ]);
     Route::get('upload', 'OrderController@orderView');
+    Route::get('history', 'OrderController@uploadHistory');
+    Route::get('gifts', 'OrderController@giftHistory');
+    Route::get('published', 'OrderController@publishedOrders')->name('orders.published');
+    Route::post('publish', 'OrderController@publishOrder');
 });
 

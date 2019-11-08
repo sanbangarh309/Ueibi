@@ -41,6 +41,12 @@ class OrderController extends Controller
         return View('support.upload',compact('users','user'));
     }
 
+    function giftHistory(){
+        $users = User::presale()->get();
+        $user = auth()->user();
+        return View('support.gifts',compact('users','user'));
+    }
+
     function publishOrder(Request $request){
         $rules = [
             'order_ids'         => 'required|array',
