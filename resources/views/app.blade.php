@@ -28,7 +28,7 @@
         <div class="black_bg">
             <div class="top_header plr_50">
                <img src="/images/logo.png" class="logo">
-               <label class="white">Sandeep Bangarh
+               <label class="white">{{auth()->user()->name}}
                 <img src="/images/close.png" class="close_img" onclick="jQuery('#logout_id').submit();">
                </label>
            </div>

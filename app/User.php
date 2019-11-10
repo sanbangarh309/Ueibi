@@ -37,6 +37,10 @@ class User extends \TCG\Voyager\Models\User
         'email_verified_at' => 'datetime',
     ];
     
+    public function ScopePresaleEmployees($query)
+    {
+        return $query->whereRoleId(3);
+    }
     public function ScopePresale($query)
     {
         return $query->whereRoleId(6);

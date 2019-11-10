@@ -23,12 +23,12 @@ class CreateTicketsTable extends Migration
             $table->foreign('assigned_to')->references('id')->on('users');
             $table->string('ticketno', 100);
             $table->string('company', 100);
-            $table->string('area', 100);
-            $table->integer('emp');
-            $table->decimal('rating', 15, 2);
-            $table->string('file', 100);
-            $table->string('status', 20);
-            $table->timestamp('received_at');
+            $table->string('area', 100)->nullable($value = true);
+            $table->integer('emp')->nullable($value = true);
+            $table->decimal('rating', 15, 2)->nullable($value = true);
+            $table->string('file', 100)->nullable($value = true);
+            $table->string('status', 20)->default('Received');
+            $table->timestamp('received_at')->nullable($value = true);
             $table->timestamps();
             $table->softDeletes();
         });

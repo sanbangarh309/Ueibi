@@ -74,7 +74,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.min.js"></script>
 <script>
   $(".selectpicker").select2({
-    tags: true
+        tags: false
   });
 getOrders();
 // let allCalls = San_Helpers.getCalls("{{route('calls.index')}}");

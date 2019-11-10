@@ -10,6 +10,6 @@ class MenuList extends Model
 
     public function ScopeActive($query)
     {
-        return $query->whereStatus(1)->where('roleid', Auth::user()->role_id);
+        return $query->whereStatus(1)->where('roleid', isset(Auth::user()->role_id) ? Auth::user()->role_id : '' );
     }
 }

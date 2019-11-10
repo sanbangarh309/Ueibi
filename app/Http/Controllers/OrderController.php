@@ -5,13 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Response;
 use Validator;
+use Redirect;
 use Illuminate\Support\Str;
 use App\Modals\Order;
+use App\Modals\OrderTicket;
 use App\User;
 use App\Modals\Task;
 
 class OrderController extends Controller
 {
+    public function __construct()
+    {
+        // echo "<pre>";print_r(Auth::user()->role_id);exit;
+        if (!isset(auth()->user()->role_id)) {
+            Redirect::to('/admin/')->send();
+        }
+    }
     /**
      * Display a listing of Orders.
      *
@@ -41,6 +50,46 @@ class OrderController extends Controller
         return View('support.upload',compact('users','user'));
     }
 
+    function commonView(){
+        switch (request()->segment(3)) {
+            case request()->segment(3) != '':
+                $page = request()->segment(3);
+                break;
+            default:
+                $page = 'Dashboard';
+                break;
+        }
+        $tickets = OrderTicket::whereStatus('received')->get();
+        $assigned_tickets = OrderTicket::whereStatus('assigned')->with('order','assignedby','assignedto')->get();
+        $users = User::presaleEmployees()->get();
+        $user = auth()->user();
+        // echo "<pre>";print_r($assigned_tickets);exit;
+        return View('common.template',compact('page','user','tickets','users','assigned_tickets'));
+    }
+
+    function saveRow(Request $request){
+        $rules = [
+            'ticket_id'         => 'required|exists:tickets,id',
+            'employee_id' => 'required|exists:users,id',
+            'status'         => 'required'
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails() ) {
+            return response()->json(['msg' => $validator->errors()->first()], 400);
+        }
+        $ticket = OrderTicket::find($request->ticket_id);
+        $ticket->status = $request->status;
+        $ticket->assigned_by = auth()->user()->id;
+        $ticket->assigned_to = $request->employee_id;
+        // $ticket->save();
+        $ticket->with('order');
+        $ticket->assigned_by = User::find($ticket->assigned_by);
+        $ticket->assigned_to = User::find($ticket->assigned_to);
+        return response()->json(['msg' => 'Record Updated Successfully', 'detail' => $ticket], 200);
+    }
+
     function giftHistory(){
         $users = User::presale()->get();
         $user = auth()->user();
@@ -60,20 +109,27 @@ class OrderController extends Controller
         if ( $validator->fails() ) {
             return response()->json(['msg' => $validator->errors()->first()], 400);
         }
-        $data = $request->validate($rules);
+        // $data = $request->validate($rules);
         foreach($request->order_ids as $orderid){
-            $insertData[] = [
+            $insrData = [
                 'order_id' => $orderid,
                 'assigned_by' => $request->assigned_by,
                 'assigned_to' => $request->assigned_to,
                 'status' => $request->status ? $request->status : 'received'
             ];
             $order = Order::find($orderid);
+            $insrData['ticketno'] = self::generateRandomString(6);
+            $insrData['company'] = $order->company;
+            $insrData['area'] = $order->area;
+            $ticketData[] = $insrData;
             $order->assigned = 1;
             $order->save();
         }
-        Task::insert($insertData);
-        return response()->json(['msg' => 'Orders Published Successfully','detail' => $insertData], 200);
+        // echo "<pre>";print_r($ticketData);
+        // exit;
+        // Task::insert($taskData);
+        OrderTicket::insert($ticketData);
+        return response()->json(['msg' => 'Orders Published Successfully','detail' => $ticketData], 200);
     }
 
     public function uploadHistory(Request $request){
