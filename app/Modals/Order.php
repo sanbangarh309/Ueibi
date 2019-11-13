@@ -13,6 +13,7 @@ class Order extends Model
      */
     protected $fillable = [
         'area', 'city', 'company','address','contact','email','industry','assigned_date','orderno'
+        ,'hr_name','hr_contact','hr_email','hr_website','emp_strength','gift_type','gift_quantity','attachment'
     ];
 
     /**

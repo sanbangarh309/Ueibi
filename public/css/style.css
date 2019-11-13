@@ -1,4 +1,4 @@
-body{background:url(img/background.jpg)repeat;background-size:cover;font-family: 'Roboto', sans-serif;background-attachment:fixed;}
+body{background:url(../images/background.jpg)repeat;background-size:cover;font-family: 'Roboto', sans-serif;background-attachment:fixed;}
 .black_bg {
     background: rgba(0, 0, 0, 0.32);
     padding: 20px 0 0;

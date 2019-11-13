@@ -27,10 +27,12 @@ Route::group(['prefix' => 'admin'], function () {
         'orders' => 'OrderController',
     ]);
     Route::get('upload', 'OrderController@orderView');
+    Route::get('publish', 'OrderController@orderView');
     Route::get('history', 'OrderController@uploadHistory');
     // Route::get('admin/presale', 'OrderController@commonView');
     Route::get('presale/gifts', 'OrderController@giftHistory');
     Route::get('presale', 'OrderController@commonView');
+    Route::get('sale', 'OrderController@commonView');
     Route::get('published', 'OrderController@publishedOrders')->name('orders.published');
     Route::post('publish', 'OrderController@publishOrder');
     Route::post('saveRow', 'OrderController@saveRow');

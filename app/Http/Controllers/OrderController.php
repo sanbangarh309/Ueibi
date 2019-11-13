@@ -36,11 +36,16 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
     */
-    public function store(Request $request)
+    public function store(Request $request,$id='')
     {
-        $data = $this->uploadData($request);
-        $orders = Order::orderBy('id', 'desc')->take(count($data))->get();
-        return response()->json(['msg' => 'Order Added Successfully','detail' => $orders], 200);
+        if($id) {
+            $order = $this->update($request,$id);
+            return response()->json(['msg' => 'Order Updated Successfully', 'detail' => $order], 200);
+        }else{
+            $data = $this->uploadData($request);
+            $orders = Order::orderBy('id', 'desc')->take(count($data))->get();
+            return response()->json(['msg' => 'Order Added Successfully','detail' => $orders], 200);
+        }
     }
 
     function orderView(){
@@ -50,21 +55,70 @@ class OrderController extends Controller
         return View('support.upload',compact('users','user'));
     }
 
+    function show($id){
+        $order = Order::find($id);
+        return response()->json(['msg' => 'Order fetched Successfully','detail' => $order], 200);
+    }
+
+    function update(Request $request, $id){
+        $rules = [
+            'hr_name'  => 'required',
+            'hr_contact' => 'required',
+            'hr_email' => 'sometimes',
+            'hr_website' => 'sometimes',
+            'emp_strength' => 'sometimes',
+            'gift_type' => 'sometimes',
+            'gift_quantity' => 'sometimes',
+            'attachment' => 'sometimes'
+        ];
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails() ) {
+            return response()->json(['msg' => $validator->errors()->first()], 400);
+        }
+        $data = $request->validate($rules);
+        // echo "<pre>";print_r($data);exit;
+        $order = Order::find($id);
+        if($request->attachment && $request->attachment != ''){
+            $file = $request->file('attachment');
+            $folder = storage_path('uploads');
+            $ext = $file->getClientOriginalExtension();
+            if ($ext) {
+                $filename = Str::random(20).'.'.$ext;
+            }else{
+                $filename = Str::random(20);
+            }
+            $upload_success = $file->move($folder, $filename);
+            if( $upload_success ) {
+                $data['attachment'] = $filename;
+            }
+        }
+        $order->update($data);
+        return response()->json(['msg' => 'Order Updated Successfully', 'detail' => $order], 200);
+        // return $order;
+        
+    }
+
     function commonView(){
-        switch (request()->segment(3)) {
-            case request()->segment(3) != '':
+        $page = request()->segment(3);
+        switch ($page) {
+            case $page != '':
                 $page = request()->segment(3);
                 break;
             default:
                 $page = 'Dashboard';
                 break;
         }
-        $tickets = OrderTicket::whereStatus('received')->get();
+        $tickets = OrderTicket::whereStatus('received')->with('order')->get();
         $assigned_tickets = OrderTicket::whereStatus('assigned')->with('order','assignedby','assignedto')->get();
         $users = User::presaleEmployees()->get();
         $user = auth()->user();
-        // echo "<pre>";print_r($assigned_tickets);exit;
-        return View('common.template',compact('page','user','tickets','users','assigned_tickets'));
+        $temp = 'template';
+        // echo "<pre>";print_r($tickets);exit;
+        if($page = 'sale') {
+            $temp = 'presale';
+        }
+        return View('common.'.$temp,compact('page','user','tickets','users','assigned_tickets'));
     }
 
     function saveRow(Request $request){

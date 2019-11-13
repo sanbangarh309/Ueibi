@@ -13,7 +13,7 @@ class OrderTicket extends Model
      * @var array
      */
     protected $fillable = [
-        'order_id', 'assigned_by', 'assigned_to','ticketno','company','area','emp','rating','file','status','received_at'
+        'order_id', 'gift', 'assigned_by', 'assigned_to','ticketno','company','area','emp','rating','file','status','received_at'
     ];
 
     /**
