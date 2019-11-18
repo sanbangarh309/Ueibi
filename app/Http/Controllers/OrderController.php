@@ -36,9 +36,10 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
     */
-    public function store(Request $request,$id='')
+    public function store(Request $request)
     {
-        if($id) {
+        $id = $request->id;
+        if($id && $id != '') {
             $order = $this->update($request,$id);
             return response()->json(['msg' => 'Order Updated Successfully', 'detail' => $order], 200);
         }else{
@@ -99,11 +100,16 @@ class OrderController extends Controller
         
     }
 
+    function supportView(Request $request){
+
+        return View('common.support');
+    }
+
     function commonView(){
-        $page = request()->segment(3);
+        $page = request()->segment(2);
         switch ($page) {
             case $page != '':
-                $page = request()->segment(3);
+                $page = request()->segment(2);
                 break;
             default:
                 $page = 'Dashboard';
@@ -114,18 +120,22 @@ class OrderController extends Controller
         $users = User::presaleEmployees()->get();
         $user = auth()->user();
         $temp = 'template';
-        // echo "<pre>";print_r($tickets);exit;
-        if($page = 'sale') {
+        if($page == 'presale') {
+            $temp = 'sale-manager';
+        }
+        if($page == 'sale') {
             $temp = 'presale';
         }
+        // echo "<pre>";print_r($page);exit;
         return View('common.'.$temp,compact('page','user','tickets','users','assigned_tickets'));
     }
 
     function saveRow(Request $request){
         $rules = [
             'ticket_id'         => 'required|exists:tickets,id',
-            'employee_id' => 'required|exists:users,id',
-            'status'         => 'required'
+            'employee_id' => 'sometimes|exists:users,id',
+            'status'         => 'sometimes',
+            'allRemarks'         => 'sometimes'
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -134,13 +144,24 @@ class OrderController extends Controller
             return response()->json(['msg' => $validator->errors()->first()], 400);
         }
         $ticket = OrderTicket::find($request->ticket_id);
-        $ticket->status = $request->status;
+        $order = Order::find($ticket->order_id);
+        if($request->has('status')) {
+            $ticket->status = $request->status;
+        }
         $ticket->assigned_by = auth()->user()->id;
-        $ticket->assigned_to = $request->employee_id;
-        // $ticket->save();
+        if($request->has('employee_id')) {
+            $ticket->assigned_to = $request->employee_id;
+        }
+        if($order && $request->has('allRemarks') && count($request->allRemarks) > 0) {
+            $order->remark = $request->allRemarks['remark'] ? : $order->remark;
+            $order->manager_remark = $request->allRemarks['manager_remark'] ? : $order->manager_remark;
+            $order->save();
+        }
+        $ticket->save();
         $ticket->with('order');
         $ticket->assigned_by = User::find($ticket->assigned_by);
         $ticket->assigned_to = User::find($ticket->assigned_to);
+        // echo "<pre>";print_r($order);exit;
         return response()->json(['msg' => 'Record Updated Successfully', 'detail' => $ticket], 200);
     }
 

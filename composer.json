@@ -32,6 +32,9 @@
         }
     },
     "autoload": {
+        "files": [
+            "app/Helpers/San_Helper.php"
+        ],
         "psr-4": {
             "App\\": "app/"
         },

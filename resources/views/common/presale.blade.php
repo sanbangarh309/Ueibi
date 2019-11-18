@@ -80,23 +80,42 @@ textarea {
         tags: false
   });
 getOrders();
-let all_fields = ['order_no','company','address','area','city'];
+let all_fields = ['orderno','company','address','area','city','email','industry','hr_name','hr_contact','hr_email','hr_website','emp_strength'];
 function showForm(id){
-    axios.get("{{url('admin/orders')}}/" + id).then((res) => {
+    getOrders_(id);
+}
+function getOrders_(id) {
+  axios.get("{{url('admin/orders')}}/" + id).then((res) => {
         let order = res.data.detail;
+        console.log(id, order);
+        $('#fill_form input[name="id"]').val(id);
         $.each( order, function( index, value ){
-            $('#fill_form input[name="'+index+'"]').val(value);
+          console.log(index, value);
+            if(all_fields.includes(index)){
+              $('#fill_form input[name="'+index+'"]').val(value);
+            }
         });
-        $("#fill_form form").attr('action', '{{url("admin/orders")}}/' + order.id);
-        console.log(order);
+        $("#fill_form form").attr('action', '{{url("admin/orders")}}/');
         $('#fill_form').modal('show');
     });
 }
+// async function getOrders_(id) {
+//     let promise = new Promise((res, rej) => {
+//       axios.get("{{url('admin/orders')}}/" + id).then((res) => {
+//         res(res.data.detail);
+//       });
+//     });
+
+//     // wait until the promise returns us a value
+//     let result = await promise; 
+//   console.log(result);
+// };
 $("#fill_form form").on('submit',function(){
     let url = $("#fill_form form").attr('action');
     let formData = new FormData(this);
     axios.post(url,formData).then((response) => {
     //   let rkt = response.data.detail;
+      $('#fill_form').modal('hide');
       toastr.success(response.data.msg);
     });
     return false;
@@ -124,10 +143,10 @@ $('.table_body').on('click','.save_row',function(e){
     let id = $(e.target).attr('data-id');
     let remarks = $(e.target.parentElement.parentElement.parentElement).next().find('textarea');
     let ticket_status = $(e.target.parentElement.parentElement.parentElement).attr('data-status');
-    remarks.each(function( index ) {
-      console.log($( this ).text());
-    });
-    return;
+    // remarks.each(function( index ) {
+    //   console.log($( this ).text());
+    // });
+    // return;
     
     let submitData = {ticket_id:id, status:'assigned', employee_id: employee_id};
     let employee_id = $('#select_' + id + ' select option:selected').val();

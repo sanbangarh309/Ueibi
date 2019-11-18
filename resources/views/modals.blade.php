@@ -62,9 +62,9 @@
           </button>
         </div>
         <div class="modal-body row">
-        <form method="post" action="" id="fill_form">
-          <input type="hidden" value="put" name="_method">
-          @csrf
+            <form method="post" action="">
+                <input type="hidden" value="" name="id">
+                @csrf
     <div class="col-md-6">
       <div class="form-group">
       <label>Order No</label>
@@ -122,7 +122,7 @@
         <div class="col-md-6">
       <div class="form-group">
       <label>Gift Quanity</label>
-      <input type="number" class="form-control" name="gift_type" placeholder="Gift Quanity">
+      <input type="number" class="form-control" name="gift_quantity" placeholder="Gift Quanity">
     </div>
        </div>
         <div class="col-md-6">
@@ -139,6 +139,7 @@
          <div class="form-group">
        <label>Attacthment</label>
        <input class="form-control" type="file" name="attachment">
+       <img src="" id="image_show" style="display:none">
        </div>
        </div>
            <div class="col-md-12">
@@ -147,11 +148,11 @@
           <textarea class="form-control" placeholder="Enter message" name="address" style="height:150px;"></textarea>
        </div>
        </div>
-       </form>
-        </div>
-        <div class="modal-footer">
+       <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+       </form>
         </div>
       </div>
     </div>

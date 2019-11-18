@@ -3,6 +3,7 @@ namespace App\Modals;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Modals\OrderTicket;
 class Order extends Model
 {
 
@@ -24,6 +25,10 @@ class Order extends Model
     protected $casts = [
         'assigned_date' => 'date'
     ];
+
+    public function ticket(){
+        return $this->hasOne(OrderTicket::class,'order_id','id');
+    }
 
     public function setOrdernoAttribute($value)
     {
