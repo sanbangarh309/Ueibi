@@ -165,6 +165,12 @@ class OrderController extends Controller
         return response()->json(['msg' => 'Record Updated Successfully', 'detail' => $ticket], 200);
     }
 
+    function publishView(){
+        $users = User::marketing()->get();
+        $assigned_tickets = OrderTicket::whereStatus('assigned')->with('order','assignedby','assignedto')->get();
+        return View('support.marketing',compact('assigned_tickets','users'));
+    }
+
     function giftHistory(){
         $users = User::presale()->get();
         $user = auth()->user();

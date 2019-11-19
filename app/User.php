@@ -45,4 +45,8 @@ class User extends \TCG\Voyager\Models\User
     {
         return $query->whereRoleId(6);
     }
+    public function ScopeMarketing($query)
+    {
+        return $query->whereRoleId(7);
+    }
 }

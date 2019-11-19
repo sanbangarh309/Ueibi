@@ -55,7 +55,7 @@ textarea {
                                 @foreach($tickets as $ticket)
                                 <tr id ="{{$ticket->id}}" data-status="received">
                                    {{-- {{\App\User::find($ticket->assigned_to)->name}} --}}
-                                   <td class="table_10">{{$ticket->ticketno}}</td>
+                                   <td class="table_10">{{$ticket->order->orderno}}</td>
                                    <td class="table_10">{{$ticket->company}}</td>
                                    <td class="table_10">{{$ticket->area}}</td>
                                    <td class="table_10">{{$ticket->city}}</td>
@@ -179,7 +179,7 @@ textarea {
                                   </td>
                                </tr>
                                <tr class="panel-collapse collapse" id="extrabox_{{$asn_ticket->id}}">
-                                <td colspan="12">
+                                 <td colspan="12">
                                         <div class="row textarea_tbl_bg table_txt_area">
                                                 <div class="col-md-2">
                                                    <div class="remark_fild">
@@ -207,7 +207,7 @@ textarea {
                                                    </div>
                                                 </div>
                                              </div>
-                                </td>
+                                       </td>
                                    </tr>
                                @endforeach
                             </tbody>

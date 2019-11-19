@@ -32,10 +32,14 @@ Route::group(['prefix' => 'admin'], function () {
     Route::resources([
         'orders' => 'OrderController',
     ]);
-    Route::get('upload', 'OrderController@orderView');
-    Route::get('support', 'OrderController@supportView');
-    Route::get('publish', 'OrderController@orderView');
-    Route::get('history', 'OrderController@uploadHistory');
+    Route::group(['prefix' => 'support'], function () {
+        Route::get('/', 'OrderController@supportView');
+        Route::get('upload', 'OrderController@orderView');
+        Route::get('publish', 'OrderController@publishView');
+        Route::get('history', 'OrderController@uploadHistory');
+    });
+    
+    
     // Route::get('admin/presale', 'OrderController@commonView');
     Route::get('presale/gifts', 'OrderController@giftHistory');
     Route::get('presale', 'OrderController@commonView');
