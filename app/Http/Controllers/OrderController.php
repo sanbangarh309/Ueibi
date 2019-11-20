@@ -9,6 +9,7 @@ use Redirect;
 use Illuminate\Support\Str;
 use App\Modals\Order;
 use App\Modals\OrderTicket;
+use App\Modals\History;
 use App\User;
 use App\Modals\Task;
 
@@ -152,6 +153,12 @@ class OrderController extends Controller
         if($request->has('employee_id')) {
             $ticket->assigned_to = $request->employee_id;
         }
+        $historyData = [
+            'assigned_by' => auth()->user()->id,
+            'assigned_to' => $request->employee_id,
+            'ticket_id' => $ticket->id
+        ];
+        History::insert($historyData);
         if($order && $request->has('allRemarks') && count($request->allRemarks) > 0) {
             $order->remark = $request->allRemarks['remark'] ? : $order->remark;
             $order->manager_remark = $request->allRemarks['manager_remark'] ? : $order->manager_remark;
@@ -190,6 +197,7 @@ class OrderController extends Controller
         if ( $validator->fails() ) {
             return response()->json(['msg' => $validator->errors()->first()], 400);
         }
+        $ticketData = [];
         // $data = $request->validate($rules);
         foreach($request->order_ids as $orderid){
             $insrData = [
@@ -198,18 +206,39 @@ class OrderController extends Controller
                 'assigned_to' => $request->assigned_to,
                 'status' => $request->status ? $request->status : 'received'
             ];
-            $order = Order::find($orderid);
-            $insrData['ticketno'] = self::generateRandomString(6);
+            if($request->has('publish_type')) {
+                $historyData = [
+                    'assigned_by' => $request->assigned_by,
+                    'assigned_to' => $request->assigned_to,
+                    'ticket_id' => $orderid
+                ];
+                $ticket = OrderTicket::find($orderid);
+                if($ticket) {
+                    History::insert($historyData);
+                }
+                $ticket->assigned_by = $request->assigned_by;
+                $ticket->assigned_to = $request->assigned_to;
+                $ticket->save();
+            } else {
+                $order = Order::find($orderid);
+                if($order) {
+                    $order->assigned = 1;
+                    $order->save();
+                }
+                $insrData['ticketno'] = self::generateRandomString(6);
+            }
             $insrData['company'] = $order->company;
             $insrData['area'] = $order->area;
             $ticketData[] = $insrData;
-            $order->assigned = 1;
-            $order->save();
+            // echo "<pre>";print_r($orderid);
+            
         }
         // echo "<pre>";print_r($ticketData);
         // exit;
         // Task::insert($taskData);
-        OrderTicket::insert($ticketData);
+        if(!$request->has('publish_type')) {
+            OrderTicket::insert($ticketData);
+        }
         return response()->json(['msg' => 'Orders Published Successfully','detail' => $ticketData], 200);
     }
 

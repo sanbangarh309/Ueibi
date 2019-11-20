@@ -102,7 +102,7 @@ textarea {
                 <div class="col-lg-6">
                     <div class="form-group">
                         <select class="form-control selectpicker" id="sel1" name="mkt_manager">
-                          <option>Select Pre Sale Manager</option>
+                          <option value="">Select Marketing Manager</option>
                           @foreach($users as $user)
                             <option value="{{$user->id}}">{{$user->name}}</option>
                           @endforeach
@@ -153,7 +153,6 @@ $(document).on('click','.check_all_boxes',function(e){
 					ids= ids+ ","+   CustomerIDArray[i];
 				}
 			});
-  console.log(CustomerIDArray);
 });
 $('#check_all').on('click',function(){
   CustomerIDArray = [];
@@ -172,7 +171,7 @@ function publishOrder(){
   jQuery.each(CustomerIDArray,function(i,item){
     $('#order_body tr#order_'+item).remove();
   });
-  axios.post("{{url('admin/publish')}}",{order_ids:CustomerIDArray, assigned_by:userId, assigned_to:assigned_to}).then((response) => {
+  axios.post("{{url('admin/publish')}}",{order_ids:CustomerIDArray, assigned_by:userId, assigned_to:assigned_to, publish_type: 'marketing'}).then((response) => {
     toastr.success(response.data.msg);
   });
 }
