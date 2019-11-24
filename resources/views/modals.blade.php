@@ -122,7 +122,7 @@
         <div class="col-md-6">
       <div class="form-group">
       <label>Gift Quanity</label>
-      <input type="number" class="form-control" name="gift_quantity" placeholder="Gift Quanity">
+      <input type="number" class="form-control" min="0" value="0" name="gift_quantity" placeholder="Gift Quanity">
     </div>
        </div>
         <div class="col-md-6">

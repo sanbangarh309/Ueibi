@@ -68,9 +68,9 @@ class OrderController extends Controller
             'hr_contact' => 'required',
             'hr_email' => 'sometimes',
             'hr_website' => 'sometimes',
-            'emp_strength' => 'sometimes',
+            'emp_strength' => 'numeric|min:0',
             'gift_type' => 'sometimes',
-            'gift_quantity' => 'sometimes',
+            'gift_quantity' => 'numeric|min:0',
             'attachment' => 'sometimes'
         ];
         $validator = Validator::make($request->all(), $rules);
@@ -79,7 +79,7 @@ class OrderController extends Controller
             return response()->json(['msg' => $validator->errors()->first()], 400);
         }
         $data = $request->validate($rules);
-        // echo "<pre>";print_r($data);exit;
+        // echo "<pre>";print_r($request->all());exit;
         $order = Order::find($id);
         if($request->attachment && $request->attachment != ''){
             $file = $request->file('attachment');
@@ -96,8 +96,8 @@ class OrderController extends Controller
             }
         }
         $order->update($data);
-        return response()->json(['msg' => 'Order Updated Successfully', 'detail' => $order], 200);
-        // return $order;
+        // return response()->json(['msg' => 'Order Updated Successfully', 'detail' => $order], 200);
+        return $order;
         
     }
 
@@ -116,6 +116,7 @@ class OrderController extends Controller
                 $page = 'Dashboard';
                 break;
         }
+        // echo "<pre>";print_r($page);exit;
         $tickets = OrderTicket::whereStatus('received')->with('order')->get();
         $assigned_tickets = OrderTicket::whereStatus('assigned')->with('order','assignedby','assignedto')->get();
         $users = User::presaleEmployees()->get();
@@ -126,6 +127,9 @@ class OrderController extends Controller
         }
         if($page == 'sale') {
             $temp = 'presale';
+        }
+        if($page == 'marketing') {
+            $temp = 'marketing-manager';
         }
         // echo "<pre>";print_r($page);exit;
         return View('common.'.$temp,compact('page','user','tickets','users','assigned_tickets'));
@@ -224,11 +228,11 @@ class OrderController extends Controller
                 if($order) {
                     $order->assigned = 1;
                     $order->save();
+                    $insrData['company'] = $order->company;
+                    $insrData['area'] = $order->area;
                 }
                 $insrData['ticketno'] = self::generateRandomString(6);
             }
-            $insrData['company'] = $order->company;
-            $insrData['area'] = $order->area;
             $ticketData[] = $insrData;
             // echo "<pre>";print_r($orderid);
             

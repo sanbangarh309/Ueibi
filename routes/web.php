@@ -38,6 +38,13 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('publish', 'OrderController@publishView');
         Route::get('history', 'OrderController@uploadHistory');
     });
+
+    Route::group(['prefix' => 'marketing'], function () {
+        Route::get('/', 'OrderController@commonView');
+        // Route::get('upload', 'OrderController@orderView');
+        // Route::get('publish', 'OrderController@publishView');
+        // Route::get('history', 'OrderController@uploadHistory');
+    });
     
     
     // Route::get('admin/presale', 'OrderController@commonView');

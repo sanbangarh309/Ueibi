@@ -2,7 +2,6 @@
 @extends('app')
 @section('css')
 <link rel="stylesheet" href="/css/card.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/css/select2.min.css" />
 <style>
 .save_row i {
     font-size: 20px;
@@ -24,22 +23,22 @@ textarea {
             <div class="col-md-12">
                <div class="rating topmargin">
                   <h2>Tickets</h2>
-                  <div class="scrolltable">
-                     <table class="table green_custom_table">
-                        <thead class="thead-dark green_head">
+                  <div class="table_rotate">
+                     <table class="table custom_table mar_b0">
+                        <thead class="thead-dark black_head">
                            <tr>
                               <th><input type="checkbox" id="check_all" value="all"></th>
-                              <th scope="col" class="table_10">Ticket#</th>
+                              <th scope="col" class="table_5 word_break">Ticket#</th>
                               <th scope="col" class="table_10">Company name</th>
                               <th scope="col" class="table_10">Area</th>
-                              <th scope="col" class="table_10">HR Email</th>
-                              <th scope="col" class="table_5">Emp. Data</th>
+                              <th scope="col" class="table_5">Emp</th>
                               <th scope="col" class="table_10">Date & Time</th>
                               <th scope="col" class="table_10">Assigned by</th>
                               <th scope="col" class="table_10">Assigned To</th>
                               <th scope="col" class="table_15">Status</th>
-                              <th scope="col" class="table_10">Action</th>
-                              {{-- <th scope="col" class="table_5"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 20px;"></i></th> --}}
+                              <th scope="col" class="table_5">Data received</th>
+                              <th scope="col" class="table_5">Rating</th>
+                              <th scope="col" class="table_5"></th>
                            </tr>
                         </thead>
                         <tbody id="assigned_table_body" class="table_body">
@@ -49,13 +48,14 @@ textarea {
                               <td class="table_5">{{$asn_ticket->ticketno}}</td>
                               <td class="table_10">{{$asn_ticket->company}}</td>
                               <td class="table_5">{{$asn_ticket->area}}</td>
-                              <td class="table_5">{{$asn_ticket->order->hr_email}}</td>
                               <td class="table_10">{{$asn_ticket->order->emp_strength}}</td>
                               <td class="table_10">{{$asn_ticket->created_at}}</td>
                               <td>{{\App\User::find($asn_ticket->assigned_by)->name}}</td>
                               <td>{{\App\User::find($asn_ticket->assigned_to)->name}}</td>
                               <td class="table_15"><span class="table_btn bg_green">{{$asn_ticket->status}}</span></td>
-                             <td class="table_5"><a data-toggle="collapse" href="#extrabox_{{$asn_ticket->id}}" class="save_row1" data-id="{{$asn_ticket->id}}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                              <td class="table_10">{{$asn_ticket->order->emp_strength}}</td>
+                              <td class="table_10">{{$asn_ticket->rating}}</td>
+                              <td class="table_5"><a data-toggle="collapse" href="#extrabox_{{$asn_ticket->id}}" class="save_row1" data-id="{{$asn_ticket->id}}"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size: 20px;"></i></a>
                               </td>
                            </tr>
                            <tr class="panel-collapse collapse" id="extrabox_{{$asn_ticket->id}}">
@@ -96,35 +96,19 @@ textarea {
                </div>
             </div>
          </div>
-         <div class="row">
-            <div class="col-md-12">
-               <div class="rating topmargin">
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <select class="form-control selectpicker" id="sel1" name="mkt_manager">
-                          <option value="">Select Marketing Manager</option>
-                          @foreach($users as $user)
-                            <option value="{{$user->id}}">{{$user->name}}</option>
-                          @endforeach
-                        </select>
-                      </div> 
-                </div>
-                <div class="col-lg-6">
-                    <div class="form-group">
-                        <button type="button" class="btn btn-success" onclick="publishOrder();">Publish</button>
-                     </div> 
-                </div>
-               </div>
-            </div>
-        </div>
+         <div class="" style="display: flex;flex-wrap: wrap;justify-content: flex-end;">
+               <select class="support_btn orange_bg" name="mkt_manager">
+                     <option value="">Select Marketing Manager</option>
+                     @foreach($users as $user)
+                       <option value="{{$user->id}}">{{$user->name}}</option>
+                     @endforeach
+                   </select><a href="javascript:void(0);" class="support_btn bg_black" onclick="publishOrder();">Publish</a>
+         </div>
 @stop
 
 @section('javascript')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/select2.min.js"></script>
 <script>
-    $(".selectpicker").select2({
-        tags: false
-  });
+
  var CustomerIDArray=[];
 $(document).on('click','.check_all_boxes',function(e){
     var arr=CustomerIDArray;
@@ -164,7 +148,6 @@ $('#check_all').on('click',function(){
   } else {
     $('.check_all_boxes').not(this).prop('checked', false);
   }
-  console.log(CustomerIDArray);
 });
 function publishOrder(){ 
   let assigned_to = $('select[name="mkt_manager"] option:selected').val();
