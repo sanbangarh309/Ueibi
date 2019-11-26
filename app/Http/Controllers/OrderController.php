@@ -98,7 +98,7 @@ class OrderController extends Controller
         $order->update($data);
         // return response()->json(['msg' => 'Order Updated Successfully', 'detail' => $order], 200);
         return $order;
-        
+
     }
 
     function supportView(Request $request){
@@ -108,6 +108,7 @@ class OrderController extends Controller
 
     function commonView(){
         $page = request()->segment(2);
+        $segment_third = request()->segment(3);
         switch ($page) {
             case $page != '':
                 $page = request()->segment(2);
@@ -128,10 +129,11 @@ class OrderController extends Controller
         if($page == 'sale') {
             $temp = 'presale';
         }
-        if($page == 'marketing') {
+        if($page == 'marketing' && $segment_third == '') {
             $temp = 'marketing-manager';
+        }elseif($segment_third == 'employee') {
+            $temp = 'mark-employee';
         }
-        // echo "<pre>";print_r($page);exit;
         return View('common.'.$temp,compact('page','user','tickets','users','assigned_tickets'));
     }
 
@@ -182,6 +184,9 @@ class OrderController extends Controller
         }
         if($request->has('marketing_rating')) {
             $order->marketing_rating = $request->marketing_rating;
+        }
+        if($request->has('presale_rating')) {
+            $order->presale_rating = $request->presale_rating;
         }
         $order->save();
         $ticket->save();
@@ -251,7 +256,7 @@ class OrderController extends Controller
             }
             $ticketData[] = $insrData;
             // echo "<pre>";print_r($orderid);
-            
+
         }
         // echo "<pre>";print_r($ticketData);
         // exit;
@@ -306,7 +311,7 @@ class OrderController extends Controller
                     $finArr['orderno'] = self::generateRandomString(6);
                     $data[] = $finArr;
                 }
-                    
+
             }
             fclose($handle);
         }

@@ -41,12 +41,13 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::group(['prefix' => 'marketing'], function () {
         Route::get('/', 'OrderController@commonView');
+        Route::get('/employee', 'OrderController@commonView');
         // Route::get('upload', 'OrderController@orderView');
         // Route::get('publish', 'OrderController@publishView');
         // Route::get('history', 'OrderController@uploadHistory');
     });
-    
-    
+
+
     // Route::get('admin/presale', 'OrderController@commonView');
     Route::get('presale/gifts', 'OrderController@giftHistory');
     Route::get('presale', 'OrderController@commonView');

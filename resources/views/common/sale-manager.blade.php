@@ -173,7 +173,7 @@ textarea {
                                   <td class="table_15"><span class="table_btn bg_green">{{$asn_ticket->status}}</span></td>
                                   <td class="table_10"><a href="javascript:void(0);" onclick="showForm('{{$asn_ticket->order->id}}');" class="view_btn">View form</a></td>
                                   <td class="table_5"><span class="table_btn bg_green">{{$asn_ticket->gift}}</span></td>
-                                  <td class="table_5">{{$asn_ticket->rating}}</td>
+                                  <td class="table_10" id="rating_{{$asn_ticket->id}}" data-id="{{$asn_ticket->id}}"><select class="form-control selectpicker" name="presale_rating"><option>Select Rating</option> @foreach([1,1.5,2,2.5,3,3.5,4,4.5,5] as $rtng)<option value="{{$rtng}}" @if($asn_ticket->order->presale_rating == $rtng) selected="selected" @endif>{{$rtng}}</option> @endforeach </select></td>
                                   <td class="table_5"><a href="javascript:void(0);" data-id="{{$asn_ticket->id}}" class="save_row"><i class="fa fa-file-text-o" data-id="{{$asn_ticket->id}}" aria-hidden="true"></i></a>
                                     <a data-toggle="collapse" href="#extrabox_{{$asn_ticket->id}}" class="save_row1" data-id="{{$asn_ticket->id}}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
                                   </td>
@@ -233,7 +233,7 @@ textarea {
                  <th scope="col">Date & Time</th>
                 <th scope="col">Assigned by</th>
                 <th scope="col">Assigned To</th>
-                <th scope="col">Status</th>	 
+                <th scope="col">Status</th>
                 <th scope="col">Actions</th>
               </tr>
             </thead>
@@ -250,7 +250,7 @@ textarea {
                    <td id="current_{{$asn_ticket->id}}" >{{\App\User::find($asn_ticket->assigned_to)->name}}<a href="javascript:void(0);" data-id="{{$asn_ticket->id}}" class="change_user"><i class="fa fa-pencil" aria-hidden="true" data-id="{{$asn_ticket->id}}"></i></a></td>
                    <td><span class="wait">{{$asn_ticket->status}}</span></td>
                    <td><a href="javascript:void(0);" data-id="{{$asn_ticket->id}}" class="save_row"><i class="fa fa-floppy-o" aria-hidden="true"></i></a>
-                    <a data-toggle="collapse" href="#extrabox_{{$asn_ticket->id}}" class="save_row" data-id="{{$asn_ticket->id}}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a> 
+                    <a data-toggle="collapse" href="#extrabox_{{$asn_ticket->id}}" class="save_row" data-id="{{$asn_ticket->id}}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
                   </td>
                  </tr>
                  <tr class="panel-collapse collapse" id="extrabox_{{$asn_ticket->id}}">
@@ -270,7 +270,7 @@ textarea {
           </div>
           </div>
           </div> --}}
-       
+
 @stop
 
 @section('javascript')
@@ -341,6 +341,10 @@ $('.table_body').on('click','.save_row',function(e){
     if(Number.isInteger(employee_id)) {
         submitData['employee_id'] = employee_id;
     }
+    let rating = $('#rating_' + id + ' select option:selected').val();
+    if(rating != '') {
+      submitData['presale_rating'] = rating;
+    }
     $('#table_body tr#' + id).remove();
     axios.post("{{url('admin/saveRow')}}",submitData).then((response) => {
       let rkt = response.data.detail;
@@ -360,8 +364,8 @@ var chart = new CanvasJS.Chart("chartContainer", {
 	axisY:{
 		includeZero: false
 	},
-	data: [{        
-		type: "line",       
+	data: [{
+		type: "line",
 		dataPoints: [
 			{ y: 450 },
 			{ y: 414},
@@ -377,8 +381,8 @@ var chart = new CanvasJS.Chart("chartContainer", {
 			{ y: 510 }
 		]
 	},
-	{        
-		type: "line",       
+	{
+		type: "line",
 		dataPoints: [
 			{ y: 450 },
 			{ y: 414},
