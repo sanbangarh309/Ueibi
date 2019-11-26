@@ -173,7 +173,7 @@ textarea {
                                   <td class="table_15"><span class="table_btn bg_green">{{$asn_ticket->status}}</span></td>
                                   <td class="table_10"><a href="javascript:void(0);" onclick="showForm('{{$asn_ticket->order->id}}');" class="view_btn">View form</a></td>
                                   <td class="table_5"><span class="table_btn bg_green">{{$asn_ticket->gift}}</span></td>
-                                  <td class="table_5">{{$asn_ticket->rating}}</td>
+                                  <td class="table_10" id="rating_{{$asn_ticket->id}}" data-id="{{$asn_ticket->id}}"><select class="form-control selectpicker" name="marketing_rating"><option>Select Rating</option> @foreach([1,1.5,2,2.5,3,3.5,4,4.5,5] as $rtng)<option value="{{$rtng}}" @if($asn_ticket->order->marketing_rating == $rtng) selected="selected" @endif>{{$rtng}}</option> @endforeach </select></td>
                                   <td class="table_5"><a href="javascript:void(0);" data-id="{{$asn_ticket->id}}" class="save_row"><i class="fa fa-file-text-o" data-id="{{$asn_ticket->id}}" aria-hidden="true"></i></a>
                                     <a data-toggle="collapse" href="#extrabox_{{$asn_ticket->id}}" class="save_row1" data-id="{{$asn_ticket->id}}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
                                   </td>
@@ -198,12 +198,12 @@ textarea {
                                                 </div>
                                                 <div class="col-md-4">
                                                    <div class="remark_fild">
-                                                      Remarks:<textarea class="txtarea_fild" placeholder="Enter Remark" id="remark_{{$asn_ticket->id}}" name="remark">{{$asn_ticket->order->remark}}</textarea>
+                                                      Remarks:<textarea class="txtarea_fild" disabled placeholder="Enter Remark" id="remark_{{$asn_ticket->id}}" name="remark">{{$asn_ticket->order->remark}}</textarea>
                                                    </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                    <div class="remark_fild">
-                                                      Managers Remarks:<textarea class="txtarea_fild" placeholder="Enter Remark" id="manager_remark_{{$asn_ticket->id}}" name="manager_remark">{{$asn_ticket->order->manager_remark}}</textarea>
+                                                      Managers Remarks:<textarea class="txtarea_fild" placeholder="Enter Remark" id="marketing_remark_{{$asn_ticket->id}}" name="marketing_remark">{{$asn_ticket->order->marketing_remark}}</textarea>
                                                    </div>
                                                 </div>
                                              </div>
@@ -340,6 +340,10 @@ $('.table_body').on('click','.save_row',function(e){
     let submitData = {ticket_id:id, status:'assigned', allRemarks: allRemarks};
     if(Number.isInteger(employee_id)) {
         submitData['employee_id'] = employee_id;
+    }
+    let rating = $('#rating_' + id + ' select option:selected').val();
+    if(rating != '') {
+      submitData['marketing_rating'] = rating;
     }
     $('#table_body tr#' + id).remove();
     axios.post("{{url('admin/saveRow')}}",submitData).then((response) => {

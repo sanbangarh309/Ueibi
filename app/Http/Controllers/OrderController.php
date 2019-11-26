@@ -157,17 +157,33 @@ class OrderController extends Controller
         if($request->has('employee_id')) {
             $ticket->assigned_to = $request->employee_id;
         }
-        $historyData = [
-            'assigned_by' => auth()->user()->id,
-            'assigned_to' => $request->employee_id,
-            'ticket_id' => $ticket->id
-        ];
-        History::insert($historyData);
+        if($request->has('employee_id')) {
+            $historyData = [
+                'assigned_by' => auth()->user()->id,
+                'assigned_to' => $request->employee_id ? : $ticket->assigned_to,
+                'ticket_id' => $ticket->id
+            ];
+            History::insert($historyData);
+        }
         if($order && $request->has('allRemarks') && count($request->allRemarks) > 0) {
             $order->remark = $request->allRemarks['remark'] ? : $order->remark;
-            $order->manager_remark = $request->allRemarks['manager_remark'] ? : $order->manager_remark;
-            $order->save();
+            if(isset($request->allRemarks['manager_remark'])){
+                $order->manager_remark = $request->allRemarks['manager_remark'] ? : $order->manager_remark;
+            }
+            if(isset($request->allRemarks['marketing_remark'])){
+                $order->marketing_remark = $request->allRemarks['marketing_remark'] ? : $order->marketing_remark;
+            }
+            if(isset($request->allRemarks['admin_remark'])){
+                $order->admin_remark = $request->allRemarks['admin_remark'] ? : $order->admin_remark;
+            }
+            if(isset($request->allRemarks['verification_remark'])){
+                $order->verification_remark = $request->allRemarks['verification_remark'] ? : $order->verification_remark;
+            }
         }
+        if($request->has('marketing_rating')) {
+            $order->marketing_rating = $request->marketing_rating;
+        }
+        $order->save();
         $ticket->save();
         $ticket->with('order');
         $ticket->assigned_by = User::find($ticket->assigned_by);
