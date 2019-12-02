@@ -11,27 +11,31 @@ color: black;
 textarea {
   width: 106px;
 }
+.btn-deep {
+  color: #fff !important;
+  background-color: #282828;
+}
 </style>
 @stop
 @section('content')
        <div class="row">
           <div class="col-md-12">
-          <div class="rating">
-          <div class="scrolltable">
-          <table class="table custom_table">
-            <thead class="thead-dark">
+            <div class="rating topmargin">
+              <h2>New Tickets</h2>
+              <div class="scrolltable">
+            <table class="table green_custom_table">
+              <thead class="thead-dark black_head">
               <tr>
-                <th scope="col">Order#</th>
+                <th scope="col">Ticket#</th>
                 <th scope="col">Company name</th>
                 <th scope="col">Area</th>
-                <th scope="col">City</th>
-                <th scope="col">Contact</th>
+                <th scope="col">HR Email</th>
+                <th scope="col">Emp. Data</th>
                 <th scope="col">Date & Time</th>
-                <th scope="col">Gift</th>
-                <th scope="col"></th>
                 <th scope="col">Assigned by</th>
                 <th scope="col">Assigned To</th>
                 <th scope="col">Status</th>
+                <th scope="col">Data Received</th>
                 <th scope="col">Actions</th>
               </tr>
             </thead>
@@ -41,15 +45,13 @@ textarea {
                    <td>{{$asn_ticket->order->orderno}}</td>
                    <td>{{$asn_ticket->order->company}}</td>
                    <td>{{$asn_ticket->order->area}}</td>
-                   <td>{{$asn_ticket->order->city}}</td>
-                   <td>{{$asn_ticket->order->contact}}</td>
+                   <td>{{$asn_ticket->order->hr_email}}</td>
+                   <td>{{$asn_ticket->order->emp_strength}}</td>
                    <td>{{$asn_ticket->created_at}}</td>
-                   <td>{{$asn_ticket->gift}}</td>
-                   <td><button class="wait btn" onclick="showForm('{{$asn_ticket->order->id}}');">Fill Form</button></td>
                    <td>{{\App\User::find($asn_ticket->assigned_by)->name}}</td>
-                   <td id="select_{{$asn_ticket->order->id}}" data-id="{{$asn_ticket->order->id}}" style="display:none"><select class="form-control selectpicker" name="presale_employees"><option>Select Employee</option> @foreach($users as $user)<option value="{{$user->id}}">{{$user->name}}</option> @endforeach </select></td>
-                   <td id="current_{{$asn_ticket->order->id}}" >{{\App\User::find($asn_ticket->assigned_to)->name}}<a href="javascript:void(0);" data-id="{{$asn_ticket->order->id}}" class="change_user"><i class="fa fa-pencil" aria-hidden="true" data-id="{{$asn_ticket->order->id}}"></i></a></td>
+                   <td>{{\App\User::find($asn_ticket->assigned_to)->name}}</td>
                    <td><span class="wait">{{$asn_ticket->status}}</span></td>
+                   <td>{{$asn_ticket->order->emp_strength}}</td>
                    <td><a href="javascript:void(0);" data-id="{{$asn_ticket->order->id}}" class="save_row"><i class="fa fa-floppy-o" aria-hidden="true"></i></a>
                     <a data-toggle="collapse" href="#extrabox_{{$asn_ticket->order->id}}" class="save_row" data-id="{{$asn_ticket->order->id}}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
                   </td>
@@ -69,6 +71,92 @@ textarea {
           </table>
           </div>
           </div>
+          </div>
+          <div class="col-md-12">
+            <div class="rating topmargin">
+              <h2>Old Tickets</h2>
+              <div class="scrolltable">
+            <table class="table green_custom_table">
+              <thead class="thead-dark black_head">
+              <tr>
+                <th scope="col">Ticket#</th>
+                <th scope="col">Company name</th>
+                <th scope="col">Area</th>
+                <th scope="col">HR Email</th>
+                <th scope="col">Emp. Data</th>
+                <th scope="col">Date & Time</th>
+                <th scope="col">Assigned by</th>
+                <th scope="col">Assigned To</th>
+                <th scope="col">Status</th>
+                <th scope="col">Data Received</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="assigned_table_body" class="table_body">
+                @foreach($old_tickets as $asn_ticket)
+                <tr id ="{{$asn_ticket->order->id}}" data-status="assigned">
+                   <td>{{$asn_ticket->order->orderno}}</td>
+                   <td>{{$asn_ticket->order->company}}</td>
+                   <td>{{$asn_ticket->order->area}}</td>
+                   <td>{{$asn_ticket->order->hr_email}}</td>
+                   <td>{{$asn_ticket->order->emp_strength}}</td>
+                   <td>{{$asn_ticket->created_at}}</td>
+                   <td>{{\App\User::find($asn_ticket->assigned_by)->name}}</td>
+                   <td>{{\App\User::find($asn_ticket->assigned_to)->name}}</td>
+                   <td><span class="wait">{{$asn_ticket->status}}</span></td>
+                   <td>{{$asn_ticket->order->emp_strength}}</td>
+                   <td><a href="javascript:void(0);" data-id="{{$asn_ticket->order->id}}" class="save_row"><i class="fa fa-floppy-o" aria-hidden="true"></i></a>
+                    <a data-toggle="collapse" href="#extrabox_{{$asn_ticket->order->id}}" class="save_row" data-id="{{$asn_ticket->order->id}}"><i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                  </td>
+                 </tr>
+                 <tr class="panel-collapse collapse" id="extrabox_{{$asn_ticket->order->id}}">
+                    <td>{{$asn_ticket->order->address}}</td>
+                    <td>{{$asn_ticket->order->email}}<br>{{$asn_ticket->order->contact}}</td>
+                    <td>Remarks: </td>
+                    <td><input type="text" placeholder="Enter Remark" id="hr_remark_{{$asn_ticket->id}}"></td>
+                    <td>Verification Remarks: </td>
+                    <td><input type="text"  placeholder="Enter Remark" id="ver_remark_{{$asn_ticket->id}}"></td>
+                    <td>Remarks: </td>
+                    <td><input type="text"  placeholder="Enter Remark" id="remark_{{$asn_ticket->id}}"></td>
+                </tr>
+                @endforeach
+              </tbody>
+          </table>
+          </div>
+          </div>
+          </div>
+          <div class="col-lg-12 col-12 mb-4 mt-4" style="margin-top: 30px;">
+            <div class="card">
+              <div class="card-body text-center">
+                <div class="row">
+                    {{-- <div class="col-lg-3">
+                        <div class="form-group">
+                            <select class="form-control selectpicker" id="sel1" name="presale_manager">
+                              <option>Select Pre Sale Manager</option>
+                              @foreach($users as $user)
+                                <option value="{{$user->id}}">{{$user->name}}</option>
+                              @endforeach
+                            </select>
+                          </div> 
+                    </div> --}}
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <button type="button" class="btn btn-deep" onclick="changeStatus('off');">Special Off</button>
+                         </div> 
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-group">
+                          <button type="button" class="btn btn-success" onclick="changeStatus('start');">Day Start</button>
+                       </div> 
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-warning" onclick="changeStatus('end');">Day End</button>
+                     </div> 
+                </div>
+                </div>
+              </div>
+            </div>
           </div>
           </div>
 @stop
@@ -145,9 +233,8 @@ $('.table_body').on('click','.save_row',function(e){
     //   console.log($( this ).text());
     // });
     // return;
-
-    let submitData = {ticket_id:id, status:'assigned', employee_id: employee_id};
     let employee_id = $('#select_' + id + ' select option:selected').val();
+    let submitData = {ticket_id:id, status:'assigned', employee_id: employee_id};
     $('#table_body tr#' + id).remove();
     axios.post("{{url('admin/saveRow')}}",submitData).then((response) => {
       let rkt = response.data.detail;
@@ -158,5 +245,8 @@ $('.table_body').on('click','.save_row',function(e){
       toastr.success(response.data.msg);
     });
 });
+function changeStatus(status){
+
+}
 </script>
 @stop

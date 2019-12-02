@@ -121,6 +121,7 @@ class OrderController extends Controller
         $tickets = OrderTicket::whereStatus('received')->with('order')->get();
         $assigned_tickets = OrderTicket::whereStatus('assigned')->with('order','assignedby','assignedto')->get();
         $users = User::presaleEmployees()->get();
+        $old_tickets = '';
         $user = auth()->user();
         $temp = 'template';
         if($page == 'presale') {
@@ -132,9 +133,10 @@ class OrderController extends Controller
         if($page == 'marketing' && $segment_third == '') {
             $temp = 'marketing-manager';
         }elseif($segment_third == 'employee') {
+            $old_tickets = OrderTicket::whereStatus('postponed')->with('order','assignedby','assignedto')->get();
             $temp = 'mark-employee';
         }
-        return View('common.'.$temp,compact('page','user','tickets','users','assigned_tickets'));
+        return View('common.'.$temp,compact('page','user','tickets','users','assigned_tickets','old_tickets'));
     }
 
     function saveRow(Request $request){
